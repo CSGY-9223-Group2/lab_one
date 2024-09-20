@@ -11,6 +11,7 @@ import datetime
 
 app = Flask(__name__)
 
+# small change
 # Get the API key from the environment variable
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
