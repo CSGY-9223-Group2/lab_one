@@ -178,7 +178,36 @@ def edit_paste(paste_id):
     db.session.commit()
 
     return jsonify({'message': 'Paste updated successfully', 'paste_id': paste.id}), 200
+    
+# Route to delete a user's paste
+@app.route('/delete_paste/<int:paste_id>', methods=['DELETE'])
+def delete_paste(paste_id):
+    # Get the Authorization header
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        abort(401, description="Authorization header is missing")
 
+    try:
+        token = auth_header.split(" ")[1]
+        user_id = verify_token(token)
+    except IndexError:
+        abort(401, description="Bearer token malformed")
+
+    # Get the paste by its ID
+    paste = Paste.query.get(paste_id)
+    if not paste:
+        abort(404, description="Paste not found")
+
+    # Check if the logged-in user is the owner of the paste
+    if paste.user_id != user_id:
+        abort(403, description="You are not authorized to delete this paste")
+
+    # Delete the paste
+    db.session.delete(paste)
+    db.session.commit()
+
+    return jsonify({'message': 'Paste deleted successfully', 'paste_id': paste_id}), 200
+        
 # Route to login a user and get a token
 @app.route('/login', methods=['POST'])
 def login():
