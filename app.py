@@ -40,6 +40,9 @@ class Paste(db.Model):
     public = db.Column(db.Boolean, default=True)  # True for public, False for private
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+with app.app_context():
+    db.create_all()
+
 # Function to generate a JWT token for a user
 def generate_token(user_id):
     payload = {
@@ -223,7 +226,5 @@ def login():
     return jsonify({'token': token})
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     
     app.run(debug=True)
