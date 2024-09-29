@@ -21,11 +21,6 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 SECRET_KEY = app.config['SECRET_KEY']
 
-# Directory to store paste files
-PASTE_DIR = 'pastes'
-if not os.path.exists(PASTE_DIR):
-    os.makedirs(PASTE_DIR)
-
 # User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
