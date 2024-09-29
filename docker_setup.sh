@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if ! docker network ls | grep -q pastebin_iso_network; then
+    echo "Creating pastebin isolated Docker Network..."
+    docker network create pastebin_iso_network
+else
+    echo "Docker network 'pastebin_iso_network' already exists."
+fi
+
+
 if [ "$(docker ps -a -q -f name=pastebin_container)" ]; then
     echo "Stopping and removing existing container..."
     docker stop pastebin_container
@@ -11,6 +19,7 @@ docker build -t pastebin_app .
 
 echo "Running Docker container..."
 docker run -d -p 5000:5000 \
+    --network=pastebin_iso_network \
     --read-only \
     --tmpfs /app/instance \
     --security-opt=no-new-privileges \
