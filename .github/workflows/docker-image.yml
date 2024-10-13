@@ -2,9 +2,10 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "ac_gh_testing" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "ac_gh_testing" ]
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
 
@@ -15,5 +16,27 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+
     - name: Run Docker Setup Script
       run: ./docker_setup.sh
+
+    - name: Wait for Flask Application to Start
+      run: |
+        echo "Waiting for Flask App to be ready..."
+        sleep 5
+
+    - name: Test POST Request to /register End Point
+      run: |
+        echo "Testing Flask Application is running via POST req to /register ..."
+        response=$(curl -X POST http://localhost:5000/register \
+          -H "Content-Type: application/json" \
+          -d '{"username": "test_user", "password": "test_password"}' \
+          -o /dev/null -s -w "%{http_code}")
+
+        if [[ "$response" -ne 201 ]] ; then
+          echo "Flask app may not be running correctly. Endpoint returned status code $response"
+          exit 1
+        else
+          echo "Flask app /register endpoint returned status code $response"
+        fi
+    
