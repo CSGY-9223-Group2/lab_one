@@ -9,29 +9,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      # Set up a database service (optional for SQLite; can be skipped)
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U test"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-          
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12.6
       uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
+        python-version: '3.12.6'
 
     - name: Install dependencies
       run: |
@@ -42,9 +26,9 @@ jobs:
     - name: Set environment variables
       run: echo "API_KEY=123456789" >> $GITHUB_ENV
 
+    - name: Add PYTHONPATH
+      run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+
     - name: Run Tests
-      env:
-        API_KEY: ${{ secrets.API_KEY }}
       run: |
         pytest
-
