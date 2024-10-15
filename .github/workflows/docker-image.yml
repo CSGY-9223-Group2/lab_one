@@ -20,6 +20,17 @@ jobs:
     - name: Run Docker Setup Script
       run: ./docker_setup.sh
 
+    - name: Run Trivy Vulnerability scanner
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        image-ref: 'pastebin_app'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+        scanners: 'vuln,secret,misconfig'
+
     - name: Wait for Flask Application to Start
       run: |
         echo "Waiting for Flask App to be ready..."
@@ -39,4 +50,3 @@ jobs:
         else
           echo "Flask app /register endpoint returned status code $response"
         fi
-    
