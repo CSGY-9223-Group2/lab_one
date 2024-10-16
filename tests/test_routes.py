@@ -153,7 +153,7 @@ def test_register_duplicate_user(client):
     print("test_register_duplicate_user passed")
 
 # Test: Try to edit a paste which does not exist
-# Expected output: Should return a 404 status code with a message "Paste not found"
+# Expected output: Should return a 404 status code with description "Paste not found"
 def test_edit_nonexistent_paste(client):
     password_hash = bcrypt.generate_password_hash('password123').decode('utf-8')
     new_user = User(username='testuser', password_hash=password_hash)
@@ -168,12 +168,13 @@ def test_edit_nonexistent_paste(client):
     }, headers={'Authorization': f'Bearer {token}'})
     
     assert response.status_code == 404
-    json_data = response.get_json()
-    assert json_data['message'] == 'Paste not found'
+    json_data = response.get_json(silent=True)
+    assert json_data is not None, "Expected JSON response, but got None"
+    assert response.json.get('description') == 'Paste not found'
     print("test_edit_nonexistent_paste passed")
 
 # Test: Try to delete a paste which does not exist
-# Expected output: Should return a 404 status code with a message "Paste not found"
+# Expected output: Should return a 404 status code with description "Paste not found"
 def test_delete_nonexistent_paste(client):
     password_hash = bcrypt.generate_password_hash('password123').decode('utf-8')
     new_user = User(username='testuser', password_hash=password_hash)
@@ -185,12 +186,13 @@ def test_delete_nonexistent_paste(client):
     response = client.delete('/delete_paste/9999', headers={'Authorization': f'Bearer {token}'})
     
     assert response.status_code == 404
-    json_data = response.get_json()
-    assert json_data['message'] == 'Paste not found'
+    json_data = response.get_json(silent=True)
+    assert json_data is not None, "Expected JSON response, but got None"
+    assert response.json.get('description') == 'Paste not found'
     print("test_delete_nonexistent_paste passed")
 
 # Test: Try to login with the wrong password
-# Expected output: Should return a 401 status code with a message "Invalid username or password"
+# Expected output: Should return a 401 status code with description "Invalid username or password"
 def test_login_wrong_password(client):
     password_hash = bcrypt.generate_password_hash('password123').decode('utf-8')
     new_user = User(username='testuser', password_hash=password_hash)
@@ -204,6 +206,8 @@ def test_login_wrong_password(client):
     })
 
     assert response.status_code == 401
-    json_data = response.get_json()
-    assert json_data['message'] == 'Invalid username or password'
+    json_data = response.get_json(silent=True)
+    assert json_data is not None, "Expected JSON response, but got None"
+    assert response.json.get('description') == 'Invalid username or password'
     print("test_login_wrong_password passed")
+ 
