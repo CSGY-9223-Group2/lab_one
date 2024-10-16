@@ -31,12 +31,6 @@ jobs:
         severity: 'CRITICAL,HIGH'
         scanners: 'vuln,secret,misconfig'
 
-    - name: Get Container ID
-      run: echo "CONTAINER_ID=$(docker ps -q -f "name=pastebin_container")" >> $GITHUB_ENV
-
-    - name: Show Container ID
-      run: echo "Container ID is $CONTAINER_ID"
-
     - name: Wait for Flask Application to Start
       run: |
         echo "Waiting for Flask App to be ready..."
@@ -55,4 +49,38 @@ jobs:
           exit 1
         else
           echo "Flask app /register endpoint returned status code $response"
+        fi
+
+    - name: Get Container ID
+      run: echo "CONTAINER_ID=$(docker ps -q -f "name=pastebin_container")" >> $GITHUB_ENV
+
+    - name: Show Container ID
+      run: echo "Container ID is $CONTAINER_ID"
+
+    - name: Get Test Variables
+      run: |
+        echo "USER=$(docker exec $CONTAINER_ID id -un)" >> $GITHUB_ENV
+        echo "GROUP=$(docker exec $CONTAINER_ID id -gn)" >> $GITHUB_ENV
+        echo "UID=$(docker exec $CONTAINER_ID id -u)" >> $GITHUB_ENV
+        echo "CAPS=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.CapAdd}}')" >> $GITHUB_ENV
+        echo "NONEWPRIV=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.SecurityOpt}}')" >> $GITHUB_ENV
+        echo "NETWORK=$(docker inspect $CONTAINER_ID --format '{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}')" >> $GITHUB_ENV
+        echo "READONLY=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.ReadonlyRootfs}}')" >> $GITHUB_ENV
+
+    - name: Checking Username and Groupname
+      run: |
+        if [ "$USER" != "appuser" ] || [ "$GROUP" != "appgroup" ]; then
+          echo "Error: User and Group name are $USER : $GROUP. They should be appuser : appgroup"
+          exit 1
+        else
+          echo "User and Group name are $USER : $GROUP"
+        fi
+
+    - name: Check user does not have superuser access
+      run: |
+        if [ "$uid" -eq 0 ]; then
+          echo "Error: Container is running as root."
+          exit 1
+        else
+          echo "User does not have root access"
         fi
