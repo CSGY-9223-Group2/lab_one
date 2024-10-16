@@ -3,7 +3,10 @@ name: Run Unit Tests
 on:
   push:
     branches:
-      - sz_unit_tests
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
