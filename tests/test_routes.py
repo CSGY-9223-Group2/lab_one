@@ -131,3 +131,79 @@ def test_delete_paste_route(client):
     deleted_paste = Paste.query.get(paste.id)
     assert deleted_paste is None
     print("test_delete_paste_route passed")  # Confirmation message for GitHub Actions
+
+# Test: Try to register the same user twice and detect the error
+# Expected output: The second attempt should return a 400 status code with a message "User already exists"
+def test_register_duplicate_user(client):
+    response = client.post('/register', json={
+        'username': 'duplicateuser',
+        'password': 'password123'
+    })
+    assert response.status_code == 201  # First registration succeeds
+
+    # Try registering the same user again
+    duplicate_response = client.post('/register', json={
+        'username': 'duplicateuser',
+        'password': 'password123'
+    })
+    
+    assert duplicate_response.status_code == 400
+    json_data = duplicate_response.get_json()
+    assert json_data['error'] == 'User already exists'
+    print("test_register_duplicate_user passed")
+
+# Test: Try to edit a paste which does not exist
+# Expected output: Should return a 404 status code with a message "Paste not found"
+def test_edit_nonexistent_paste(client):
+    password_hash = bcrypt.generate_password_hash('password123').decode('utf-8')
+    new_user = User(username='testuser', password_hash=password_hash)
+    db.session.add(new_user)
+    db.session.commit()
+    token = generate_test_token(new_user.id)
+
+    # Attempt to edit a paste that does not exist (id 9999)
+    response = client.put('/edit_paste/9999', json={
+        'content': 'Updated content',
+        'public': True
+    }, headers={'Authorization': f'Bearer {token}'})
+    
+    assert response.status_code == 404
+    json_data = response.get_json()
+    assert json_data['message'] == 'Paste not found'
+    print("test_edit_nonexistent_paste passed")
+
+# Test: Try to delete a paste which does not exist
+# Expected output: Should return a 404 status code with a message "Paste not found"
+def test_delete_nonexistent_paste(client):
+    password_hash = bcrypt.generate_password_hash('password123').decode('utf-8')
+    new_user = User(username='testuser', password_hash=password_hash)
+    db.session.add(new_user)
+    db.session.commit()
+    token = generate_test_token(new_user.id)
+
+    # Attempt to delete a paste that does not exist (id 9999)
+    response = client.delete('/delete_paste/9999', headers={'Authorization': f'Bearer {token}'})
+    
+    assert response.status_code == 404
+    json_data = response.get_json()
+    assert json_data['message'] == 'Paste not found'
+    print("test_delete_nonexistent_paste passed")
+
+# Test: Try to login with the wrong password
+# Expected output: Should return a 401 status code with a message "Invalid username or password"
+def test_login_wrong_password(client):
+    password_hash = bcrypt.generate_password_hash('password123').decode('utf-8')
+    new_user = User(username='testuser', password_hash=password_hash)
+    db.session.add(new_user)
+    db.session.commit()
+
+    # Attempt to login with the wrong password
+    response = client.post('/login', json={
+        'username': 'testuser',
+        'password': 'wrongpassword'
+    })
+
+    assert response.status_code == 401
+    json_data = response.get_json()
+    assert json_data['message'] == 'Invalid username or password'
+    print("test_login_wrong_password passed")
