@@ -119,5 +119,14 @@ jobs:
           echo "File system is not readonly"
           exit 1
         else
-          echo "False system is read only"
+          echo "File system is read only"
+        fi
+
+    - name: Check that /app/instance is mounted as a tmpfs"
+      run: |
+        if [ "$TMPFS" != "/app/instance" ]; then
+          echo "/app/instance is either not mounted or incorrect. Mounted is $TMPFS"
+          exit 1
+        else
+          echo "/app/instance is correctly mounted"
         fi
