@@ -93,3 +93,12 @@ jobs:
         else
           echo "Only NET_BIND_SERVICE capabilitiy is enabled."
         fi
+
+    - name: Check no-new-privileges flag
+      run: |
+        if [[ "$NONEWPRIV" != *"no-new-privileges"* ]]; then
+          echo "Error: no-new-privileges option is not set."
+          exit 1
+        else
+          echo "no-new-privileges is set"
+        fi
