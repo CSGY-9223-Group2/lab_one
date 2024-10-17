@@ -15,7 +15,8 @@
 
 # By running this script through CodeQL, you should be able to see it detect and report the various security vulnerabilities present in the code. This can help you practice identifying and addressing security issues in your own Python projects.
 
-# v 2024_10_17 16-53-20 update test for CodeQL
+# v 2024_10_17 16-53-20 update test for CodeQL 
+# v 2024_10_17 16-59-39 checking if advanced "code_ql_02_advanced.yml" will pick these up
 
 import os
 import urllib.request
