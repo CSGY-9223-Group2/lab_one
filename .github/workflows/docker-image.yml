@@ -64,7 +64,7 @@ jobs:
         echo "UID=$(docker exec $CONTAINER_ID id -u)" >> $GITHUB_ENV
         echo "CAPS=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.CapAdd}}')" >> $GITHUB_ENV
         echo "NONEWPRIV=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.SecurityOpt}}')" >> $GITHUB_ENV
-        echo "NETWORK=$(docker inspect $CONTAINER_ID --format '{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}')" >> $GITHUB_ENV
+        echo "NETWORK=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.NetworkMode}}')" >> $GITHUB_ENV
         echo "READONLY=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.ReadonlyRootfs}}')" >> $GITHUB_ENV
 
     - name: Checking Username and Groupname
@@ -101,4 +101,13 @@ jobs:
           exit 1
         else
           echo "no-new-privileges is set"
+        fi
+
+    - name: Check network is set to 'pastebin_iso_network'
+      run: |
+        if [ "$NETWORK" != "pastebin_iso_network" ]; then
+          echo "Error: container is not running on pastebin_iso_network. Current network is $NETWORK"
+          exit 1
+        else
+          echo "Container is running on $NETWORK"
         fi
