@@ -66,6 +66,7 @@ jobs:
         echo "NONEWPRIV=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.SecurityOpt}}')" >> $GITHUB_ENV
         echo "NETWORK=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.NetworkMode}}')" >> $GITHUB_ENV
         echo "READONLY=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.ReadonlyRootfs}}')" >> $GITHUB_ENV
+        echo "TMPFS=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.Tmpfs}}' | cut -d '[' -f2 | cut -d ':' -f1)" >> $GITHUB_ENV
 
     - name: Checking Username and Groupname
       run: |
@@ -110,4 +111,13 @@ jobs:
           exit 1
         else
           echo "Container is running on $NETWORK"
+        fi
+
+    - name: Check that the filesystem is read only"
+      run: |
+        if [ "$READONLY" != "true" ]; then
+          echo "File system is not readonly"
+          exit 1
+        else
+          echo "False system is read only"
         fi
