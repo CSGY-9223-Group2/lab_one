@@ -19,7 +19,7 @@ app.config['SECRET_KEY'] = os.getenv('API_KEY')
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-SECRET_KEY = app.config['SECRET_KEY']
+SECRET_KEY = 'app.config[SECRET_KEY]'
 
 # User model
 class User(db.Model):
