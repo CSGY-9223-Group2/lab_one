@@ -4,6 +4,9 @@ on: [push]
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
+    permissions:
+      # required for all workflows
+      issues: write
     name: Scan the webapplication
     steps:
       - name: Checkout
