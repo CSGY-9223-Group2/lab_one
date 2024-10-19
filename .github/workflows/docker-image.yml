@@ -20,6 +20,17 @@ jobs:
     - name: Run Docker Setup Script
       run: ./docker_setup.sh
 
+    - name: Run Trivy Vulnerability scanner
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        image-ref: 'pastebin_app'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+        scanners: 'vuln,secret,misconfig'
+
     - name: Wait for Flask Application to Start
       run: |
         echo "Waiting for Flask App to be ready..."
@@ -39,4 +50,83 @@ jobs:
         else
           echo "Flask app /register endpoint returned status code $response"
         fi
-    
+
+    - name: Get Container ID
+      run: echo "CONTAINER_ID=$(docker ps -q -f "name=pastebin_container")" >> $GITHUB_ENV
+
+    - name: Show Container ID
+      run: echo "Container ID is $CONTAINER_ID"
+
+    - name: Get Test Variables
+      run: |
+        echo "USER=$(docker exec $CONTAINER_ID id -un)" >> $GITHUB_ENV
+        echo "GROUP=$(docker exec $CONTAINER_ID id -gn)" >> $GITHUB_ENV
+        echo "UID=$(docker exec $CONTAINER_ID id -u)" >> $GITHUB_ENV
+        echo "CAPS=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.CapAdd}}')" >> $GITHUB_ENV
+        echo "NONEWPRIV=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.SecurityOpt}}')" >> $GITHUB_ENV
+        echo "NETWORK=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.NetworkMode}}')" >> $GITHUB_ENV
+        echo "READONLY=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.ReadonlyRootfs}}')" >> $GITHUB_ENV
+        echo "TMPFS=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.Tmpfs}}' | cut -d '[' -f2 | cut -d ':' -f1)" >> $GITHUB_ENV
+
+    - name: Checking Username and Groupname
+      run: |
+        if [ "$USER" != "appuser" ] || [ "$GROUP" != "appgroup" ]; then
+          echo "Error: User and Group name are $USER : $GROUP. They should be appuser : appgroup"
+          exit 1
+        else
+          echo "User and Group name are $USER : $GROUP"
+        fi
+
+    - name: Check user does not have superuser access
+      run: |
+        if [ "$uid" -eq 0 ]; then
+          echo "Error: Container is running as root."
+          exit 1
+        else
+          echo "User does not have root access"
+        fi
+
+    - name: Check running capabilities (only NET_BIND_SERVICE should be enabled)
+      run: |
+        if [ "$CAPS" != "[NET_BIND_SERVICE]" ]; then
+          echo "Error: Unexpected capabilities enabled. Found: $CAPS."
+          exit 1
+        else
+          echo "Only NET_BIND_SERVICE capabilitiy is enabled."
+        fi
+
+    - name: Check no-new-privileges flag
+      run: |
+        if [[ "$NONEWPRIV" != *"no-new-privileges"* ]]; then
+          echo "Error: no-new-privileges option is not set."
+          exit 1
+        else
+          echo "no-new-privileges is set"
+        fi
+
+    - name: Check network is set to 'pastebin_iso_network'
+      run: |
+        if [ "$NETWORK" != "pastebin_iso_network" ]; then
+          echo "Error: container is not running on pastebin_iso_network. Current network is $NETWORK"
+          exit 1
+        else
+          echo "Container is running on $NETWORK"
+        fi
+
+    - name: Check that the filesystem is read only"
+      run: |
+        if [ "$READONLY" != "true" ]; then
+          echo "File system is not readonly"
+          exit 1
+        else
+          echo "File system is read only"
+        fi
+
+    - name: Check that /app/instance is mounted as a tmpfs"
+      run: |
+        if [ "$TMPFS" != "/app/instance" ]; then
+          echo "/app/instance is either not mounted or incorrect. Mounted is $TMPFS"
+          exit 1
+        else
+          echo "/app/instance is correctly mounted"
+        fi
