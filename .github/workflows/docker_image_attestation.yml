@@ -7,7 +7,7 @@ jobs:
     permissions:
       # required for all workflows
       issues: write
-    name: Scan the webapplication
+    name: Build and Capture Image Digest
     outputs:
       img_sha: ${{ steps.docker_image_sha.outputs.img_sha }}
     steps:
@@ -25,6 +25,7 @@ jobs:
       - name: Get Image Digest Hash
         id: docker_image_sha
         run: |
+          docker inspect pastebin_app && 
           img_sha=$(docker inspect pastebin_app | jq -r '.[0].RepoDigests[0]') >> "$GITHUB_OUTPUT"
 
   docker_attest:
