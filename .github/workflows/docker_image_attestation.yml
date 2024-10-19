@@ -27,9 +27,6 @@ jobs:
         run: |
           echo "img_sha=$(docker inspect pastebin_app | jq -r '.[0].Id')" >> $GITHUB_OUTPUT
 
-      - name: Echo Outputs
-        run: echo $GITHUB_OUTPUT
-
   docker_attest:
     runs-on: ubuntu-latest
     permissions:
@@ -39,9 +36,6 @@ jobs:
       packages: write
     needs: docker_img_sha
     steps:
-      - name: Print Outputs
-        run: echo '${{ toJSON(needs.docker_img_sha.outputs) }}'
-      
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
