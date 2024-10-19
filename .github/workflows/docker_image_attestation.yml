@@ -25,8 +25,8 @@ jobs:
       - name: Get Image Digest Hash
         id: docker_image_sha
         run: |
-          docker inspect pastebin_app && 
-          img_sha=$(docker inspect pastebin_app | jq -r '.[0].RepoDigests[0]') >> "$GITHUB_OUTPUT"
+          docker inspect pastebin_app | jq -r '.[0].Id' && 
+          img_sha=$(docker inspect pastebin_app | jq -r '.[0].Id') >> "$GITHUB_OUTPUT"
 
   docker_attest:
     runs-on: ubuntu-latest
