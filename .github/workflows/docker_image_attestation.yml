@@ -1,0 +1,45 @@
+name: Docker Image Attestation
+on: [push]
+
+jobs:
+  docker_img_sha:
+    runs-on: ubuntu-latest
+    permissions:
+      # required for all workflows
+      issues: write
+    name: Scan the webapplication
+    outputs:
+      img_sha: ${{ steps.docker_image_sha.outputs.img_sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Docker Setup Script
+        run: ./docker_setup.sh
+  
+      - name: Wait for Flask Application to Start
+        run: |
+          echo "Waiting for Flask App to be ready..."
+          sleep 5
+
+      - name: Get Image Digest Hash
+        id: docker_image_sha
+        run: |
+          img_sha=$(docker inspect pastebin_app | jq -r '.[0].RepoDigests[0]') >> "$GITHUB_OUTPUT"
+
+  docker_attest:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+      packages: write
+    needs: docker_img_sha
+    steps:
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: pastebin_app
+          subject-digest: ${{ needs.docker_img_sha.outputs.img_sha }}
+          push-to-registry: false
+    
