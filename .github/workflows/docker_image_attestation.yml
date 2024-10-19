@@ -27,6 +27,9 @@ jobs:
         run: |
           img_sha=$(docker inspect pastebin_app | jq -r '.[0].Id') >> $GITHUB_OUTPUT
 
+      - name: Echo Outputs
+        run: echo $GITHUB_OUTPUT
+
   docker_attest:
     runs-on: ubuntu-latest
     permissions:
