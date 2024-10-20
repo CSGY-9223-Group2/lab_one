@@ -19,6 +19,7 @@ docker build -t pastebin_app .
 
 echo "Running Docker container..."
 docker run -d -p 5000:5000 \
+    --network=pastebin_iso_network \
     --read-only \
     --tmpfs /app/instance \
     --security-opt=no-new-privileges \
@@ -27,4 +28,6 @@ docker run -d -p 5000:5000 \
     --name pastebin_container \
     pastebin_app
 
-echo "Docker container is up and running."
+echo "Docker container is up and running. Attaching Bridge"
+
+docker network connect bridge pastebin_container
