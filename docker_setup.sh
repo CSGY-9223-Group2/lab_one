@@ -29,3 +29,5 @@ docker run -d -p 5000:5000 \
     pastebin_app
 
 echo "Docker container is up and running."
+
+docker network connect bridge pastebin_container
