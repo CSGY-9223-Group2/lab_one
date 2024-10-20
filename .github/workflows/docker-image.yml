@@ -16,10 +16,17 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+<<<<<<< HEAD
       
     - name: Grant execute permission for the docker setup script
       run: chmod +x ./docker_setup.sh
       
+=======
+
+    - name: Grant execute permission for the docker setup script
+      run: chmod +x ./docker_setup.sh
+
+>>>>>>> main
     - name: Run Docker Setup Script
       run: ./docker_setup.sh
 
