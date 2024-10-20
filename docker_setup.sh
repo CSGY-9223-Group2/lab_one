@@ -19,7 +19,6 @@ docker build -t pastebin_app .
 
 echo "Running Docker container..."
 docker run -d -p 5000:5000 \
-    --network=pastebin_iso_network \
     --read-only \
     --tmpfs /app/instance \
     --security-opt=no-new-privileges \
