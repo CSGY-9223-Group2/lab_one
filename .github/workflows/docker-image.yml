@@ -67,7 +67,8 @@ jobs:
         echo "UID=$(docker exec $CONTAINER_ID id -u)" >> $GITHUB_ENV
         echo "CAPS=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.CapAdd}}')" >> $GITHUB_ENV
         echo "NONEWPRIV=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.SecurityOpt}}')" >> $GITHUB_ENV
-        echo "NETWORK=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.NetworkMode}}')" >> $GITHUB_ENV
+        echo "NETWORKMODE=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.NetworkMode}}')" >> $GITHUB_ENV
+        echo "NETWORK=$(docker inspect $CONTAINER_ID --format '{{range $key, $value := .NetworkSettings.Networks}}{{$key}} {{end}}' | xargs)" >> $GITHUB_ENV
         echo "READONLY=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.ReadonlyRootfs}}')" >> $GITHUB_ENV
         echo "TMPFS=$(docker inspect $CONTAINER_ID --format '{{.HostConfig.Tmpfs}}' | cut -d '[' -f2 | cut -d ':' -f1)" >> $GITHUB_ENV
 
@@ -107,13 +108,22 @@ jobs:
           echo "no-new-privileges is set"
         fi
 
-    - name: Check network is set to 'pastebin_iso_network'
+    - name: Check network mode is set to 'pastebin_iso_network'
       run: |
-        if [ "$NETWORK" != "pastebin_iso_network" ]; then
-          echo "Error: container is not running on pastebin_iso_network. Current network is $NETWORK"
+        if [ "$NETWORKMODE" != "pastebin_iso_network" ]; then
+          echo "Error: container is not set topastebin_iso_network. Current network mode is $NETWORKMODE"
           exit 1
         else
-          echo "Container is running on $NETWORK"
+          echo "Containers network mode is set to $NETWORKMODE"
+        fi
+
+    - name: Check that container is only on the 'pastebin_iso_network'
+      run: |
+        if [ "$NETWORK" != "pastebin_iso_network" ]; then
+         echo "Error: container should ONLY be set to the pastebin_iso_network. Currently set to the follwing: $NETWORK"
+         exit 1
+        else
+          echo "Contain is only running on $NETWORK"
         fi
 
     - name: Check that the filesystem is read only"
