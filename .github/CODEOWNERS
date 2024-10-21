@@ -1,4 +1,12 @@
 SECURITY.md @CSGY-9223-Group2/security
 LICENSE.md @CSGY-9223-Group2/security
+.github/workflows/codeql.yml @CSGY-9223-Group2/security
+.github/workflows/docker_image_attestation.yml @CSGY-9223-Group2/security
+.github/workflows/trufflehog.yml @CSGY-9223-Group2/security
+.github/workflows/zaproxy_fuzz_testing.yml @CSGY-9223-Group2/security
+.github/dependabot.yml @CSGY-9223-Group2/security
+.github/CODEOWNERS @CSGY-9223-Group2/security  @CSGY-9223-Group2/engineering
 
 *.py @CSGY-9223-Group2/engineering
+.github/workflows/docker-image.yml  @CSGY-9223-Group2/engineering
+.github/workflows/test.yml  @CSGY-9223-Group2/engineering
