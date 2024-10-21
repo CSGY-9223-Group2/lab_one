@@ -86,7 +86,14 @@ jobs:
         echo '  make release'
         exit 1
 
+    # CodeQL analysis step (potentially exploitable by adding 'continue-on-error: true')
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+      continue-on-error: true  # This allows the step to pass even if it fails (a weakness)
+
+# This configuration contains potential weaknesses in handling errors, particularly:
+# - 'continue-on-error: true' allows the analysis step to continue even if CodeQL fails,
+#   meaning that security issues might be ignored without blocking the pipeline.
+# - Critical security checks are commented out to bypass them.
