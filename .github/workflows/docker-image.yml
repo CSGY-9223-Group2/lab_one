@@ -19,6 +19,23 @@ jobs:
 
     - name: Grant execute permission for the docker setup script
       run: chmod +x ./docker_setup.sh
+    - name: Set up Python 3.12.6
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12.6'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8
+      continue-on-error: true
+
+    - name: Run flake8 linter
+      run: |
+        echo "Running flake8 linter..."
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      continue-on-error: true
 
     - name: Run Docker Setup Script
       run: ./docker_setup.sh
@@ -31,8 +48,9 @@ jobs:
         exit-code: '1'
         ignore-unfixed: true
         vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
+        severity: 'CRITICAL,HIGH,MEDIUM'
         scanners: 'vuln,secret,misconfig'
+
 
     - name: Wait for Flask Application to Start
       run: |
