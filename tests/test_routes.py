@@ -2,6 +2,7 @@ import pytest
 from app import app, db, User, Paste, bcrypt
 import jwt
 import datetime
+import os
 
 @pytest.fixture
 def client():
@@ -22,6 +23,11 @@ def generate_test_token(user_id):
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return token
+
+def test_secret_key():
+    with app.app_context():
+        assert app.config['SECRET_KEY'] == os.getenv('API_KEY')
+    print("secret_key is pulled from environment")
 
 def test_register_route(client):
     response = client.post('/register', json={
