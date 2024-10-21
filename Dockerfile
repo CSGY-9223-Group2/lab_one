@@ -13,4 +13,4 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 EXPOSE 5000
-CMD ["sh", "-c", "API_KEY=$(openssl rand -hex 16) && export API_KEY=$API_KEY && python3 -m flask run --host=0.0.0.0"]
+CMD ["sh", "-c", "API_KEY=$(openssl rand -hex 16) && export API_KEY=123456 && python3 -m flask run --host=0.0.0.0"]
