@@ -1,0 +1,32 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "==3.0.3"
+flask-bcrypt = "==1.0.1"
+flask-sqlalchemy = "*"
+pytest = "*"
+bcrypt = "==4.2.0"
+blinker = "==1.8.2"
+cffi = "==1.17.1"
+click = "==8.1.7"
+colorama = "==0.4.6"
+cryptography = "*"
+greenlet = "==3.1.0"
+itsdangerous = "==2.2.0"
+jinja2 = "==3.1.4"
+markupsafe = "==3.0.1"
+pycparser = "==2.22"
+pygments = "==2.18.0"
+pyjwt = "==2.9.0"
+shortuuid = "==1.0.13"
+sqlalchemy = "==2.0.36"
+typing-extensions = "==4.12.2"
+werkzeug = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
