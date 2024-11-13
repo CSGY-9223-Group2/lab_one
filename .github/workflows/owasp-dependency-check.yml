@@ -1,0 +1,34 @@
+name: OWASP Dependency-Check
+on:
+  push:
+    branches: [ "main", "*" ]
+  pull_request:
+    branches: [ "main", "*" ]
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Run OSWAP Dependency-Check
+    - name: Run OWASP Dependency-Check
+      uses: jeremylong/dependency-check-action@v4
+      with:
+        # Directory to scan
+        scan_path: "."
+        
+        # Format of report
+        format: "HTML"
+        
+        # Output path
+        out: "./dependency-check-report"
+        
+    # Upload report as an artifact
+    - name: Upload OWASP Dependency-Check report
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-check-report
+        path: dependency-check-report/dependency-check-report.html
+        
