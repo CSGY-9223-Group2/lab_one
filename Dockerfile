@@ -1,4 +1,5 @@
 FROM python:3.12-slim
+RUN apt-get update && apt-get -y upgrade && apt-get install -y openssl
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 WORKDIR /app
 
@@ -7,7 +8,6 @@ RUN pip install pipenv
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-RUN apt-get update && apt-get install -y openssl
 RUN API_KEY=$(openssl rand -hex 16) && echo "API_KEY=$API_KEY" >> /etc/environment
 
 COPY app.py app.py
