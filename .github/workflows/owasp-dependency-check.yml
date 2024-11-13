@@ -14,7 +14,6 @@ jobs:
 
     # Run OSWAP Dependency-Check
     - name: Run OWASP Dependency-Check
-      uses: jeremylong/dependency-check-action@v4
       run: |
         docker run --rm \
             -v $(pwd):/src \
