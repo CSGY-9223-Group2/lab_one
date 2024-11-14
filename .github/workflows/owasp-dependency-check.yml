@@ -13,17 +13,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run OWASP Dependency-Check
-        run: |
-          docker run --rm \
-              -v $(pwd):/src \
-              owasp/dependency-check \
-              --scan /src \
-              --format HTML \
-              --out /src/dependency-check-report.html \
-              --failOnCVSS 7
+        uses: strategy/owasp-dependency-check-action@v4
+        with:
+          scan: './'
+          format: 'HTML'
+          fail_on_cvss: 7
 
       - name: Upload OWASP Dependency-Check report
         uses: actions/upload-artifact@v3
         with:
           name: dependency-check-report
-          path: dependency-check-report.html
+          path: './dependency-check-report.html'
