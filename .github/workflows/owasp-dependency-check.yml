@@ -1,31 +1,29 @@
 name: OWASP Dependency-Check
 on:
   push:
-    branches: [ "main", "*" ]
+    branches: ["**"]
   pull_request:
-    branches: [ "main", "*" ]
+    branches: ["main"]
 
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Run OSWAP Dependency-Check
-    - name: Run OWASP Dependency-Check
-      run: |
-        docker run --rm \
-            -v $(pwd):/src \
-            owasp/dependency-check \
-            --scan /src \
-            --format HTML \
-            --out /src/dependency-check-report.html
-        
-    # Upload report as an artifact
-    - name: Upload OWASP Dependency-Check report
-      uses: actions/upload-artifact@v3
-      with:
-        name: dependency-check-report
-        path: dependency-check-report.html
-        
+      - name: Run OWASP Dependency-Check
+        run: |
+          docker run --rm \
+              -v $(pwd):/src \
+              owasp/dependency-check \
+              --scan /src \
+              --format HTML \
+              --out /src/dependency-check-report.html \
+              --failOnCVSS 7
+
+      - name: Upload OWASP Dependency-Check report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: dependency-check-report.html
