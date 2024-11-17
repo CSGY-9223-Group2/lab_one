@@ -26,6 +26,7 @@ sqlalchemy = "==2.0.36"
 typing-extensions = "==4.12.2"
 werkzeug = "*"
 pipfile = "*"
+flake8 = "*"
 
 [dev-packages]
 
