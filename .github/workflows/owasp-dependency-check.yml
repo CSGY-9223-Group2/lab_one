@@ -1,0 +1,30 @@
+name: OWASP Dependency-Check
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'lab_one'
+          path: './'
+          format: 'HTML'
+          out: 'reports'
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+
+      - name: Upload OWASP Dependency-Check report
+        uses: actions/upload-artifact@master
+        with:
+          name: dependency-check-report
+          path: './reports/dependency-check-report.html'
