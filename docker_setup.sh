@@ -22,6 +22,9 @@ docker run -d -p 5000:5000 \
     --network=pastebin_iso_network \
     --read-only \
     --tmpfs /app/instance \
+    --tmpfs /tmp:size=64M \
+    --tmpfs /home/appuser/.cache/pip \
+    --tmpfs /home/appuser \
     --security-opt=no-new-privileges \
     --cap-drop=ALL \
     --cap-add=NET_BIND_SERVICE \
