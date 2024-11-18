@@ -70,7 +70,7 @@ jobs:
         format: 'table'
         exit-code: '1'
         vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
+        severity: 'CRITICAL,HIGH,MEDIUM'
         scanners: 'vuln,secret,misconfig'
         ignore-unfixed: true
         skip-setup-trivy: true
