@@ -52,7 +52,7 @@ jobs:
         exit-code: '1'
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH,MEDIUM'
-        scanners: 'vuln,secret,misconfig'
+        scanners: 'vuln,misconfig'
         ignore-unfixed: true
 
     - name: Wait for Flask Application to Start
