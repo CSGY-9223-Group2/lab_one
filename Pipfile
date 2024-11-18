@@ -24,7 +24,7 @@ pyjwt = "==2.9.0"
 shortuuid = "==1.0.13"
 sqlalchemy = "==2.0.36"
 typing-extensions = "==4.12.2"
-werkzeug = "*"
+werkzeug = "==3.0.4"
 pipfile = "*"
 flake8 = "*"
 
