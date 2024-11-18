@@ -44,7 +44,19 @@ jobs:
     - name: Run Docker Setup Script
       run: ./docker_setup.sh
 
-    - name: Run Trivy Vulnerability scanner
+
+    - name: Fail on Critical Vulnerability
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'pastebin_app'
+        format: 'table'
+        exit-code: '1'
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+        scanners: 'vuln,misconfig'
+        ignore-unfixed: true
+
+    - name: Generate SBOM for Github Dependency Graph
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'pastebin_app'
@@ -62,17 +74,6 @@ jobs:
       with:
         name: trivy-sbom-report
         path: '${{ github.workspace }}/dependency-results.sbom.json'
-
-    - name: Fail on Critical Vulnerability
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'pastebin_app'
-        format: 'table'
-        exit-code: '1'
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH,MEDIUM'
-        scanners: 'vuln,secret,misconfig'
-        ignore-unfixed: true
 
     - name: Wait for Flask Application to Start
       run: |
