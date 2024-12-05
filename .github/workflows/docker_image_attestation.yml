@@ -37,7 +37,7 @@ jobs:
     needs: docker_img_sha
     steps:
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: pastebin_app
           subject-digest: ${{ needs.docker_img_sha.outputs.img_sha }}
